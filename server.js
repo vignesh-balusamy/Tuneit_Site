@@ -43,7 +43,16 @@ async function fetchOnlineMetadata(query) {
     if (metadataCache[query]) return metadataCache[query];
     try {
         const safeQuery = encodeURIComponent(query);
-        const response = await fetch(`https://itunes.apple.com/search?term=${safeQuery}&entity=song&limit=1`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // Strict 3 second timeout
+        
+        const response = await fetch(`https://itunes.apple.com/search?term=${safeQuery}&entity=song&limit=1`, {
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) throw new Error(`iTunes HTTP Error: ${response.status}`);
+        
         const data = await response.json();
         if (data.results && data.results.length > 0) {
             const track = data.results[0];
@@ -57,7 +66,9 @@ async function fetchOnlineMetadata(query) {
             saveCache();
             return result;
         }
-    } catch (e) { console.error("iTunes API error:", query); }
+    } catch (e) { 
+        console.error("iTunes API failed or timed out for:", query, "-", e.message); 
+    }
     metadataCache[query] = null;
     saveCache();
     return null;
@@ -91,7 +102,10 @@ app.post('/api/sync-likes', (req, res) => {
 // --- MUSIC ENDPOINTS ---
 app.get('/api/songs', async (req, res) => {
   try {
+    console.log("Fetching songs from Cloudinary...");
     const result = await cloudinary.api.resources({ resource_type: 'video', max_results: 100, context: true, tags: true });
+    console.log(`Found ${result.resources.length} resources in Cloudinary.`);
+    
     const songsPromises = result.resources
       .filter(file => !file.public_id.startsWith('samples/'))
       .map(async file => {
@@ -145,10 +159,11 @@ app.get('/api/songs', async (req, res) => {
     });
 
     const songs = await Promise.all(songsPromises);
+    console.log("Successfully processed all songs, sending to client.");
     res.json({ success: true, songs });
   } catch (error) {
-    console.error("Cloudinary Error:", error);
-    res.status(500).json({ success: false, error: 'Failed to fetch songs' });
+    console.error("Cloudinary Error or API failure:", error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to fetch songs' });
   }
 });
 

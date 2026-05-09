@@ -138,9 +138,12 @@ async function fetchSongs() {
         if(data.success) {
             allSongs = data.songs;
             loadingIndicator.style.display = 'none';
+        } else {
+            loadingIndicator.innerHTML = `<p style="color: #ef4444;">Error loading songs: ${data.error || 'Server error'}</p>`;
         }
     } catch (error) {
         console.error("Error fetching songs:", error);
+        loadingIndicator.innerHTML = `<p style="color: #ef4444;">Network error while loading songs.</p>`;
     }
 }
 
