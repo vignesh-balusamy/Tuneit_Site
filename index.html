@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tuneit - Premium</title>
+    <meta name="description" content="A premium, blue-themed music player.">
+    <!-- Google Fonts for typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Dynamic Background Elements for Premium feel -->
+    <div class="bg-shape bg-shape-1"></div>
+    <div class="bg-shape bg-shape-2"></div>
+
+    <!-- Auth Modal (Login Screen) -->
+    <div class="modal-overlay" id="auth-modal" style="display: none;">
+        <div class="auth-box glass-panel">
+            <div style="text-align: center; margin-bottom: 8px;">
+                <img src="assets/logo.png" alt="Tuneit" style="width: 48px; border-radius: 12px; margin-bottom: 8px;">
+                <h1 style="font-family: var(--font-heading); color: var(--accent-light);">Tuneit</h1>
+            </div>
+            <div class="auth-header" style="justify-content: center;">
+                <h2 id="auth-title">Sign In</h2>
+            </div>
+            <form id="auth-form">
+                <input type="text" id="auth-username" placeholder="Username" required>
+                <input type="password" id="auth-password" placeholder="Password" required>
+                <p id="auth-error" style="color: #ef4444; font-size: 12px; margin-top: -8px; display: none;"></p>
+                <button type="submit" class="auth-submit-btn" id="auth-submit-btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="app-container glass-panel">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-container">
+                <img src="assets/logo.png" alt="Tuneit Logo" class="logo-img">
+                <div class="logo-text-wrapper">
+                    <span class="logo-text">Tuneit</span>
+                    <span class="built-by">Built by Vignesh</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" id="nav-home">
+                    <i data-lucide="home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-search">
+                    <i data-lucide="search"></i>
+                    <span>Search</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-library">
+                    <i data-lucide="library"></i>
+                    <span>Your Library</span>
+                </a>
+                <a href="#" class="nav-item" id="btn-logout" style="margin-top: auto; color: #ef4444;">
+                    <i data-lucide="log-out"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+
+            <div class="playlists">
+                <div class="playlist-header">
+                    <span>PLAYLISTS</span>
+                    <i data-lucide="plus-square" class="add-icon"></i>
+                </div>
+                <div class="playlist-list">
+                    <a href="#" class="nav-item-sub" id="nav-favorites">Favorites</a>
+                    <a href="#" class="nav-item-sub" id="nav-chill">Chill Vibes</a>
+                    <a href="#" class="nav-item-sub" id="nav-workout">Workout Mix</a>
+                    <a href="#" class="nav-item-sub" id="nav-focus">Focus</a>
+                    <a href="#" class="nav-item-sub" id="nav-driving">Driving</a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar glass-panel-header">
+                <div class="nav-arrows">
+                    <button class="icon-btn"><i data-lucide="chevron-left"></i></button>
+                    <button class="icon-btn"><i data-lucide="chevron-right"></i></button>
+                </div>
+                
+                <div class="search-container" id="search-container" style="display: none;">
+                    <i data-lucide="search" class="search-icon-input"></i>
+                    <input type="text" id="search-input" placeholder="Search by title, artist, or genre...">
+                </div>
+
+                <div class="user-profile" id="user-profile-btn" title="Login / Profile">
+                    <i data-lucide="user"></i>
+                </div>
+            </header>
+
+            <div class="content-scroll" id="main-scroll-area">
+                <div id="loading-indicator" style="text-align: center; margin-top: 50px;">
+                    <i data-lucide="loader" class="spin-icon"></i>
+                    <p style="margin-top: 16px; color: var(--text-muted); font-family: 'Outfit', sans-serif;">Syncing your premium library...</p>
+                </div>
+
+                <!-- Dynamic Content Area -->
+                <div id="dynamic-content"></div>
+            </div>
+        </main>
+        
+        <!-- Queue Side Panel -->
+        <aside class="queue-panel glass-panel" id="queue-panel">
+            <div class="queue-header">
+                <h2>Up Next</h2>
+                <button class="icon-btn" id="close-queue-btn"><i data-lucide="x"></i></button>
+            </div>
+            <div class="queue-list" id="queue-list">
+                <!-- Queue items injected here -->
+            </div>
+        </aside>
+    </div>
+
+    <!-- Player Bar -->
+    <footer class="player-bar glass-panel-player">
+        <div class="player-content-wrapper">
+            <div class="now-playing">
+                <img src="assets/album_art.png" alt="Now Playing" class="now-playing-img" id="bottom-album-art">
+                <div class="now-playing-info">
+                    <div class="title" id="bottom-title">Select a song</div>
+                    <div class="artist" id="bottom-artist">-</div>
+                </div>
+                <button class="like-btn-wrapper" id="btn-like" style="background:none; border:none; cursor:pointer; margin-left: 8px; display:flex; align-items:center;">
+                    <i data-lucide="heart" class="like-btn-icon"></i>
+                </button>
+            </div>
+
+            <div class="player-controls">
+                <div class="control-buttons">
+                    <button class="control-btn" id="btn-shuffle"><i data-lucide="shuffle"></i></button>
+                    <button class="control-btn" id="btn-prev"><i data-lucide="skip-back"></i></button>
+                    <button class="control-btn play-pause-btn" id="bottom-play-btn">
+                        <i data-lucide="play" id="play-icon-bottom" style="margin-left: 2px;"></i>
+                    </button>
+                    <button class="control-btn" id="btn-next"><i data-lucide="skip-forward"></i></button>
+                    <button class="control-btn" id="btn-repeat"><i data-lucide="repeat"></i></button>
+                </div>
+                <div class="progress-container">
+                    <span class="time current-time">0:00</span>
+                    <div class="progress-bar-bg" id="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                    </div>
+                    <span class="time total-time">0:00</span>
+                </div>
+            </div>
+
+            <div class="visualizer-wrapper">
+                <canvas id="visualizer" class="visualizer-canvas"></canvas>
+            </div>
+
+            <div class="volume-controls">
+                <button class="queue-btn-wrapper" id="btn-visualizer-toggle" style="background:none; border:none; cursor:pointer; display:flex; align-items:center;" title="Toggle Visualizer">
+                    <i data-lucide="activity" class="vol-icon-small queue-btn-icon"></i>
+                </button>
+                <button class="queue-btn-wrapper" id="btn-queue" style="background:none; border:none; cursor:pointer; display:flex; align-items:center;" title="Queue">
+                    <i data-lucide="list-music" class="vol-icon-small queue-btn-icon"></i>
+                </button>
+                <button class="queue-btn-wrapper" id="btn-mute" style="background:none; border:none; cursor:pointer; display:flex; align-items:center;">
+                    <i data-lucide="speaker" class="vol-icon"></i>
+                </button>
+                <div class="volume-bar-bg" id="volume-bar-bg">
+                    <div class="volume-bar-fill" id="volume-bar-fill"></div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Audio Element (crossorigin is required for Web Audio API visualizer) -->
+    <audio id="audio-player" crossorigin="anonymous"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>
