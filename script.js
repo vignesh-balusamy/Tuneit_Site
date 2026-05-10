@@ -25,6 +25,8 @@ const dynamicContent = document.getElementById('dynamic-content');
 const loadingIndicator = document.getElementById('loading-indicator');
 const searchContainer = document.getElementById('search-container');
 const searchInput = document.getElementById('search-input');
+const searchContainerMobile = document.getElementById('search-container-mobile');
+const searchInputMobile = document.getElementById('search-input-mobile');
 
 // Queue Elements
 const queuePanel = document.getElementById('queue-panel');
@@ -380,9 +382,14 @@ function updateNavUI(activeId) {
     if(activeEl) activeEl.classList.add('active');
     
     // Also update mobile nav sync
-    if(activeId === 'nav-home') mNavHome.classList.add('active');
-    if(activeId === 'nav-search') mNavSearch.classList.add('active');
     if(activeId === 'nav-library') mNavLibrary.classList.add('active');
+
+    // Handle Mobile Search Visibility
+    if (activeId === 'nav-search' && window.innerWidth <= 768) {
+        searchContainerMobile.style.display = 'flex';
+    } else {
+        searchContainerMobile.style.display = 'none';
+    }
 }
 
 function clearActiveNav() {
@@ -400,6 +407,7 @@ navFocus.addEventListener('click', (e) => { e.preventDefault(); clearActiveNav()
 navDriving.addEventListener('click', (e) => { e.preventDefault(); clearActiveNav(); navDriving.classList.add('active'); renderSmartMoodView('Driving'); });
 
 searchInput.addEventListener('input', (e) => { renderSearchView(e.target.value); });
+searchInputMobile.addEventListener('input', (e) => { renderSearchView(e.target.value); });
 
 // --- Render Functions ---
 function renderHomeView() {
