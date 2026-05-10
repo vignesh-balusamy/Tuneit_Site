@@ -1,5 +1,9 @@
 {
   "appId": "com.vignesh.tuneit",
   "appName": "Tuneit",
-  "webDir": "."
+  "webDir": "dist",
+  "server": {
+    "url": "https://tuneit-music.onrender.com",
+    "cleartext": true
+  }
 }

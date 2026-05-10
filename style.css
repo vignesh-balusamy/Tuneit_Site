@@ -751,3 +751,111 @@ button { background: none; border: none; color: inherit; cursor: pointer; }
 .spin-icon { animation: spin 1s linear infinite; color: var(--accent); }
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .no-results { text-align: center; padding: 40px; color: var(--text-muted); font-size: 16px; }
+
+/* --- Mobile Responsiveness --- */
+.mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--glass-border);
+    z-index: 100;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.mobile-nav-item {
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    transition: all 0.3s ease;
+}
+
+.mobile-nav-item.active {
+    color: var(--accent-light);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    body { overflow: auto; height: auto; min-height: 100vh; }
+    
+    .app-container {
+        flex-direction: column;
+        height: auto;
+        border: none;
+    }
+
+    .sidebar { display: none; }
+    
+    .mobile-bottom-nav { display: flex; }
+
+    .main-content {
+        height: auto;
+        padding-bottom: 160px; /* Space for player + nav */
+    }
+
+    .top-bar { padding: 12px 16px; }
+    
+    .content-scroll { padding: 16px; }
+    
+    .grid-container {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 16px;
+    }
+
+    .section-title { font-size: 20px; }
+
+    /* Player Bar Responsive */
+    .player-bar {
+        position: fixed;
+        bottom: 65px; /* Above mobile nav */
+        left: 0;
+        right: 0;
+        height: auto;
+        padding: 10px 0;
+        border-top: 1px solid var(--glass-border);
+    }
+
+    .player-content-wrapper {
+        flex-direction: column;
+        height: auto;
+        gap: 10px;
+        padding: 10px 16px;
+    }
+
+    .now-playing {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .player-controls {
+        width: 100%;
+        max-width: none;
+    }
+
+    .control-buttons { gap: 32px; }
+
+    .visualizer-wrapper, .volume-controls { display: none; }
+    
+    .queue-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 65px;
+        width: 100%;
+        transform: translateY(100%);
+    }
+    
+    .queue-panel.open {
+        transform: translateY(0);
+    }
+}

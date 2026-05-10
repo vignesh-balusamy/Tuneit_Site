@@ -43,6 +43,12 @@ const navFocus = document.getElementById('nav-focus');
 const navDriving = document.getElementById('nav-driving');
 const btnLogout = document.getElementById('btn-logout');
 
+// Mobile Nav DOM
+const mNavHome = document.getElementById('m-nav-home');
+const mNavSearch = document.getElementById('m-nav-search');
+const mNavLibrary = document.getElementById('m-nav-library');
+const mBtnLogout = document.getElementById('m-btn-logout');
+
 // Controls
 const btnShuffle = document.getElementById('btn-shuffle');
 const btnPrev = document.getElementById('btn-prev');
@@ -368,14 +374,25 @@ document.addEventListener('visibilitychange', () => {
 
 
 // --- Navigation Handlers ---
+function updateNavUI(activeId) {
+    document.querySelectorAll('.nav-item, .nav-item-sub, .mobile-nav-item').forEach(el => el.classList.remove('active'));
+    const activeEl = document.getElementById(activeId);
+    if(activeEl) activeEl.classList.add('active');
+    
+    // Also update mobile nav sync
+    if(activeId === 'nav-home') mNavHome.classList.add('active');
+    if(activeId === 'nav-search') mNavSearch.classList.add('active');
+    if(activeId === 'nav-library') mNavLibrary.classList.add('active');
+}
+
 function clearActiveNav() {
     document.querySelectorAll('.nav-item, .nav-item-sub').forEach(el => el.classList.remove('active'));
     searchContainer.style.display = 'none';
 }
 
-navHome.addEventListener('click', (e) => { e.preventDefault(); clearActiveNav(); navHome.classList.add('active'); renderHomeView(); });
-navSearch.addEventListener('click', (e) => { e.preventDefault(); clearActiveNav(); navSearch.classList.add('active'); searchContainer.style.display = 'flex'; searchInput.value = ''; searchInput.focus(); renderSearchView(''); });
-navLibrary.addEventListener('click', (e) => { e.preventDefault(); clearActiveNav(); navLibrary.classList.add('active'); renderLibraryView(); });
+navHome.addEventListener('click', (e) => { e.preventDefault(); clearActiveNav(); navHome.classList.add('active'); updateNavUI('nav-home'); renderHomeView(); });
+navSearch.addEventListener('click', (e) => { e.preventDefault(); clearActiveNav(); navSearch.classList.add('active'); updateNavUI('nav-search'); searchContainer.style.display = 'flex'; searchInput.value = ''; searchInput.focus(); renderSearchView(''); });
+navLibrary.addEventListener('click', (e) => { e.preventDefault(); clearActiveNav(); navLibrary.classList.add('active'); updateNavUI('nav-library'); renderLibraryView(); });
 navFavorites.addEventListener('click', (e) => { e.preventDefault(); clearActiveNav(); navFavorites.classList.add('active'); renderFavoritesView(); });
 navChill.addEventListener('click', (e) => { e.preventDefault(); clearActiveNav(); navChill.classList.add('active'); renderSmartMoodView('Chill'); });
 navWorkout.addEventListener('click', (e) => { e.preventDefault(); clearActiveNav(); navWorkout.classList.add('active'); renderSmartMoodView('Workout'); });
@@ -475,7 +492,7 @@ function createSection(title, songsToRender, contextPlaylist) {
 
         card.innerHTML = `
             <div class="card-img-wrapper">
-                <img src="${song.thumbnail}" alt="Album Art">
+                <img src="${song.thumbnail}" alt="Album Art" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/26/26437.png';">
                 <button class="card-download-btn ${dlClass}" data-id="${song.id}">
                     <i data-lucide="${dlIcon}" style="width: 16px; height: 16px;"></i>
                 </button>

@@ -21,7 +21,7 @@
     <div class="modal-overlay" id="auth-modal" style="display: none;">
         <div class="auth-box glass-panel">
             <div style="text-align: center; margin-bottom: 8px;">
-                <img src="assets/logo.png" alt="Tuneit" style="width: 48px; border-radius: 12px; margin-bottom: 8px;">
+                <img src="assets/logo.png" alt="Tuneit" style="width: 48px; border-radius: 12px; margin-bottom: 8px;" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3844/3844724.png';">
                 <h1 style="font-family: var(--font-heading); color: var(--accent-light);">Tuneit</h1>
             </div>
             <div class="auth-header" style="justify-content: center;">
@@ -40,7 +40,7 @@
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="logo-container">
-                <img src="assets/logo.png" alt="Tuneit Logo" class="logo-img">
+                <img src="assets/logo.png" alt="Tuneit Logo" class="logo-img" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3844/3844724.png';">
                 <div class="logo-text-wrapper">
                     <span class="logo-text">Tuneit</span>
                     <span class="built-by">Built by Vignesh</span>
@@ -126,7 +126,7 @@
     <footer class="player-bar glass-panel-player">
         <div class="player-content-wrapper">
             <div class="now-playing">
-                <img src="assets/album_art.png" alt="Now Playing" class="now-playing-img" id="bottom-album-art">
+                <img src="assets/album_art.png" alt="Now Playing" class="now-playing-img" id="bottom-album-art" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/26/26437.png';">
                 <div class="now-playing-info">
                     <div class="title" id="bottom-title">Select a song</div>
                     <div class="artist" id="bottom-artist">-</div>
@@ -178,6 +178,26 @@
 
     <!-- Audio Element (crossorigin is required for Web Audio API visualizer) -->
     <audio id="audio-player" crossorigin="anonymous"></audio>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+        <a href="#" class="mobile-nav-item active" id="m-nav-home">
+            <i data-lucide="home"></i>
+            <span>Home</span>
+        </a>
+        <a href="#" class="mobile-nav-item" id="m-nav-search">
+            <i data-lucide="search"></i>
+            <span>Search</span>
+        </a>
+        <a href="#" class="mobile-nav-item" id="m-nav-library">
+            <i data-lucide="library"></i>
+            <span>Library</span>
+        </a>
+        <a href="#" class="mobile-nav-item" id="m-btn-logout" style="color: #ef4444;">
+            <i data-lucide="log-out"></i>
+            <span>Logout</span>
+        </a>
+    </nav>
 
     <script src="script.js"></script>
 </body>
