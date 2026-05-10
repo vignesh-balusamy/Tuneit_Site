@@ -124,11 +124,13 @@ async function init() {
     const savedUser = localStorage.getItem(STORAGE_USER);
     if(savedUser) {
         currentUser = JSON.parse(savedUser);
+        appContainer.style.display = 'flex';
         updateAvatar();
         authModal.style.display = 'none';
         await loadAppData(); // Only load app if logged in
     } else {
         // Enforce Login
+        appContainer.style.display = 'none';
         updateAvatar();
         authModal.style.display = 'flex';
     }
@@ -189,6 +191,7 @@ authForm.addEventListener('submit', async (e) => {
             currentUser = data.user;
             localStorage.setItem(STORAGE_USER, JSON.stringify(currentUser));
             updateAvatar();
+            appContainer.style.display = 'flex';
             authModal.style.display = 'none';
             
             // Now load the app data
@@ -221,6 +224,7 @@ function performLogout() {
         dynamicContent.innerHTML = '';
         allSongs = [];
         currentPlaylist = [];
+        appContainer.style.display = 'none';
         authModal.style.display = 'flex';
         
         // Reset form
@@ -439,13 +443,21 @@ function renderLibraryView() {
     dynamicContent.innerHTML = '';
     if(allSongs.length === 0) return;
 
-    // On mobile, show Favorites at the top of Library
-    if (window.innerWidth <= 1024) {
+    // On mobile/tablet, show Favorites and Mood Mixes at the top of Library
+    if (window.innerWidth <= 1280) {
         const likes = getLikedSongs();
         const favSongs = allSongs.filter(s => likes.includes(s.id));
         if(favSongs.length > 0) {
             dynamicContent.appendChild(createSection('Your Favorites', favSongs, favSongs));
         }
+
+        const moods = ['Driving', 'Workout', 'Chill', 'Focus'];
+        moods.forEach(mood => {
+            const moodSongs = allSongs.filter(s => s.mood === mood);
+            if(moodSongs.length > 0) {
+                dynamicContent.appendChild(createSection(`${mood} Mix`, moodSongs, moodSongs));
+            }
+        });
     }
 
     const byArtist = {};
