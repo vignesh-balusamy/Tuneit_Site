@@ -37,8 +37,20 @@ async function syncMetadata() {
 
         console.log(`Found ${allResources.length} files to process.\n`);
 
+        let apiCallsUsed = 0;
+        const API_LIMIT = 450; // Stay safely under 500
+
         for (const file of allResources) {
             if (file.public_id.startsWith('samples/')) continue;
+
+            // Auto-pause if approaching rate limit
+            if (apiCallsUsed >= API_LIMIT) {
+                console.log(`\n⏸️  Approaching API rate limit (${apiCallsUsed} calls used).`);
+                console.log(`   Waiting 60 minutes for limit to reset...`);
+                await new Promise(resolve => setTimeout(resolve, 60 * 60 * 1000));
+                apiCallsUsed = 0;
+                console.log(`▶️  Resuming sync...\n`);
+            }
             
             console.log(`Checking: ${file.public_id}`);
             
@@ -102,7 +114,8 @@ async function syncMetadata() {
                         thumbnail: thumbnail || ''
                     }
                 });
-                console.log(`  💾 Cloudinary context updated!\n`);
+                apiCallsUsed++;
+                console.log(`  💾 Cloudinary context updated! (API calls this hour: ${apiCallsUsed})\n`);
 
             } catch (err) {
                 console.error(`  ❌ Failed: ${err.message}\n`);
