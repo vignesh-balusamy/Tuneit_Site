@@ -1,0 +1,22 @@
+{
+    "actors": {
+        "Vijay": ["Gilli", "Ghilli", "Kuruvi", "Kaththi", "Master", "Leo", "Bigil", "Mersal", "Theri", "Thuppakki", "Sarkar", "Varisu", "Beast", "Pokkiri", "Vettaikaaran", "Villu", "Sura", "Kavalan", "Kuruvi", "Friends", "Kushi", "Priyamudan", "Velayudham"],
+        "Surya": ["Singam", "Ayan", "24", "Ghajini", "Maattrraan", "Vaaranam Aayiram", "Kaakha Kaakha", "Soorarai Pottru", "Jai Bhim", "Sillunu Oru Kaadhal"],
+        "Dhanush": ["3", "Asuran", "Vada Chennai", "Polladhavan", "Aadukalam", "VIP", "Velaiilla Pattadhari", "Maaran", "Raayan"],
+        "Ajith": ["Mankatha", "Vedalam", "Viswasam", "Arrambam", "Billa", "Varalaaru", "Vaali", "Thunivu", "Valimai"],
+        "Sivakarthikeyan": ["Remo", "Doctor", "Don", "Maaveeran", "Ethir Neechal", "Varuthapadatha Valibar Sangam"],
+        "Rajinikanth": ["Enthiran", "Sivaji", "Petta", "Jailer", "Baasha", "Padayappa", "Kabali"],
+        "Kamal Haasan": ["Vikram", "Indian", "Nayagan", "Dasavathaaram", "Vishwaroopam"],
+        "Vikram": ["Anniyan", "I", "Pithamagan", "Deiva Thirumagal", "Saamy", "Ponniyin Selvan"],
+        "Karthi": ["Paiya", "Paiyaa", "Siruthai", "Kaithi", "Sulthan", "Komban"],
+        "Jiiva": ["Dishyum", "Ko", "Siva Manasula Sakthi", "Endrendrum Punnagai"]
+    },
+    "composers": {
+        "A.R. Rahman": ["Sivaji", "Enthiran", "I", "Mersal", "Sarkar", "Bigil"],
+        "Anirudh Ravichander": ["3", "Master", "Vikram", "Leo", "Jailer", "Petta", "Ethir Neechal", "VIP", "Maaran"],
+        "Harris Jayaraj": ["Ghajini", "Anniyan", "Maattrraan", "Ayan", "Singam", "Kaakha Kaakha"],
+        "Yuvan Shankar Raja": ["Paiya", "Mankatha", "Sillunu Oru Kaadhal", "Aaru", "7G Rainbow Colony"],
+        "Vidyasagar": ["Gilli", "Ghilli", "Kuruvi", "Vettaikaaran", "Mozhi", "Dhill"],
+        "Vijay Antony": ["Dishyum", "Naan", "Salim", "Pichaikkaran"]
+    }
+}

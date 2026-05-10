@@ -98,6 +98,7 @@ const STORAGE_USER = 'tuneit_user';
 // Auth DOM
 const authModal = document.getElementById('auth-modal');
 const authForm = document.getElementById('auth-form');
+const appContainer = document.querySelector('.app-container');
 const authTitle = document.getElementById('auth-title');
 const authError = document.getElementById('auth-error');
 const userProfileBtn = document.getElementById('user-profile-btn');
@@ -122,16 +123,14 @@ async function init() {
     
     // Check Auto Sign-in
     const savedUser = localStorage.getItem(STORAGE_USER);
-    if(savedUser) {
+    if (savedUser) {
         currentUser = JSON.parse(savedUser);
-        appContainer.style.display = 'flex';
-        updateAvatar();
+        updateAvatar(); // Fix: Call updateAvatar to show initials
+        appContainer.style.display = 'flex'; 
         authModal.style.display = 'none';
-        await loadAppData(); // Only load app if logged in
+        loadAppData();
     } else {
-        // Enforce Login
         appContainer.style.display = 'none';
-        updateAvatar();
         authModal.style.display = 'flex';
     }
 }
@@ -158,8 +157,18 @@ async function initDownloads() {
 }
 
 async function fetchSongs() {
+    const user = currentUser || JSON.parse(localStorage.getItem(STORAGE_USER));
+    if (!user) {
+        console.error("No user found for fetchSongs");
+        return;
+    }
+
     try {
-        const response = await fetch('/api/songs');
+        const response = await fetch('/api/songs', {
+            headers: {
+                'x-auth-user': user.username
+            }
+        });
         const data = await response.json();
         
         if(data.success) {
@@ -427,16 +436,59 @@ navWorkout.addEventListener('click', (e) => { e.preventDefault(); clearActiveNav
 navFocus.addEventListener('click', (e) => { e.preventDefault(); clearActiveNav(); navFocus.classList.add('active'); renderSmartMoodView('Focus'); });
 navDriving.addEventListener('click', (e) => { e.preventDefault(); clearActiveNav(); navDriving.classList.add('active'); renderSmartMoodView('Driving'); });
 
-searchInput.addEventListener('input', (e) => { renderSearchView(e.target.value); });
-searchInputMobile.addEventListener('input', (e) => { renderSearchView(e.target.value); });
+searchInput.addEventListener('input', (e) => { 
+    updateClearButtonVisibility(e.target.value);
+    renderSearchView(e.target.value); 
+});
+searchInputMobile.addEventListener('input', (e) => { 
+    renderSearchView(e.target.value); 
+});
+
+function updateClearButtonVisibility(query) {
+    let clearBtn = document.getElementById('search-clear-btn');
+    if (!clearBtn) {
+        clearBtn = document.createElement('button');
+        clearBtn.id = 'search-clear-btn';
+        clearBtn.innerHTML = '<i data-lucide="x"></i>';
+        clearBtn.className = 'search-clear-btn';
+        searchInput.parentElement.appendChild(clearBtn);
+        lucide.createIcons({root: searchInput.parentElement});
+        
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            updateClearButtonVisibility('');
+            renderSearchView('');
+            searchInput.focus();
+        });
+    }
+    clearBtn.style.display = query.length > 0 ? 'flex' : 'none';
+}
 
 // --- Render Functions ---
 function renderHomeView() {
     dynamicContent.innerHTML = '';
     if(allSongs.length === 0) return;
-    const recentlyAdded = allSongs.slice(0, 4);
-    dynamicContent.appendChild(createSection('Recently Added', recentlyAdded, allSongs)); 
-    dynamicContent.appendChild(createSection('All Tracks', allSongs, allSongs));
+
+    const mainHeader = document.createElement('div');
+    mainHeader.className = 'view-header';
+    mainHeader.innerHTML = `
+        <h1>Home</h1>
+        <button class="play-all-btn primary" id="global-play-home">
+            <i data-lucide="play-circle"></i> Play All
+        </button>
+    `;
+    dynamicContent.appendChild(mainHeader);
+    
+    document.getElementById('global-play-home').addEventListener('click', () => {
+        currentPlaylist = allSongs;
+        playSong(allSongs[0].id);
+    });
+
+    const recentlyAdded = [...allSongs].reverse().slice(0, 6);
+    // Passing false to createSection to hide section-level play all
+    dynamicContent.appendChild(createSection('Recently Added', recentlyAdded, allSongs, false)); 
+    dynamicContent.appendChild(createSection('All Tracks', allSongs, allSongs, false));
+    lucide.createIcons({root: mainHeader});
 }
 
 function renderLibraryView() {
@@ -495,29 +547,98 @@ function renderSmartMoodView(mood) {
 
 function renderSearchView(query) {
     dynamicContent.innerHTML = '';
-    const lowerQuery = query.toLowerCase();
+    const qLower = query.toLowerCase().trim();
     
-    const filteredSongs = allSongs.filter(song => 
-        song.title.toLowerCase().includes(lowerQuery) ||
-        song.artist.toLowerCase().includes(lowerQuery) ||
-        song.genre.toLowerCase().includes(lowerQuery)
-    );
+    if (qLower === '') {
+        dynamicContent.innerHTML = '<div class="no-results">Type something to search for songs, artists, or movies.</div>';
+        return;
+    }
+
+    const isMovieSearch = qLower.includes('movie') || qLower.includes('film');
+    const isSongSearch = qLower.includes('song');
+    const isArtistSearch = qLower.includes('artist') || qLower.includes('by ') || qLower.includes('singer');
+    
+    const tokens = qLower.split(/\s+/)
+                         .filter(t => t.length > 0 && !['songs', 'song', 'movie', 'film', 'by', 'the', 'of'].includes(t));
+    
+    if (tokens.length === 0) {
+        tokens.push(qLower);
+    }
+
+    const filteredSongs = allSongs.filter(song => {
+        const searchText = `${song.title} ${song.artist} ${song.movie || ''} ${song.actors || ''} ${song.musicDirector || ''} ${song.genre}`.toLowerCase();
+        
+        // If searching for "movie", prioritize movie/actor matches
+        if (isMovieSearch) {
+            return tokens.some(t => (song.movie && song.movie.toLowerCase().includes(t)) || (song.actors && song.actors.toLowerCase().includes(t)));
+        }
+        
+        // Default: require all tokens to be present somewhere
+        return tokens.every(token => searchText.includes(token));
+    });
 
     if(filteredSongs.length === 0) {
         dynamicContent.innerHTML = `<div class="no-results">No results found for "${query}"</div>`;
         return;
     }
-    dynamicContent.appendChild(createSection('Search Results', filteredSongs, filteredSongs));
+
+    const viewHeader = document.createElement('div');
+    viewHeader.className = 'view-header';
+    viewHeader.innerHTML = `
+        <h1>Results for "${query}"</h1>
+        <button class="play-all-btn primary" id="global-play-search">
+            <i data-lucide="play-circle"></i> Play All
+        </button>
+    `;
+    dynamicContent.appendChild(viewHeader);
+
+    document.getElementById('global-play-search').addEventListener('click', () => {
+        currentPlaylist = filteredSongs;
+        playSong(filteredSongs[0].id);
+    });
+
+    dynamicContent.appendChild(createSection('', filteredSongs, filteredSongs));
+    lucide.createIcons({root: viewHeader});
 }
 
-function createSection(title, songsToRender, contextPlaylist) {
+function createSection(title, songsToRender, contextPlaylist, showPlayAll = true) {
     const section = document.createElement('section');
     section.className = 'section';
     
+    const sectionHeader = document.createElement('div');
+    sectionHeader.className = 'section-header';
+    sectionHeader.style.display = 'flex';
+    sectionHeader.style.justifyContent = 'space-between';
+    sectionHeader.style.alignItems = 'center';
+    sectionHeader.style.marginBottom = '20px';
+
     const h2 = document.createElement('h2');
     h2.className = 'section-title';
+    h2.style.marginBottom = '0';
     h2.textContent = title;
-    section.appendChild(h2);
+    
+    if (title && title.trim() !== '') {
+        if (showPlayAll) {
+            const playAllBtn = document.createElement('button');
+            playAllBtn.className = 'play-all-btn';
+            playAllBtn.innerHTML = '<i data-lucide="play-circle"></i> Play All';
+
+            playAllBtn.addEventListener('click', () => {
+                if(songsToRender.length > 0) {
+                    currentPlaylist = contextPlaylist;
+                    playSong(songsToRender[0].id);
+                }
+            });
+            sectionHeader.appendChild(h2);
+            sectionHeader.appendChild(playAllBtn);
+        } else {
+            sectionHeader.appendChild(h2);
+        }
+    } else {
+        sectionHeader.style.display = 'none'; 
+    }
+
+    section.appendChild(sectionHeader);
 
     const grid = document.createElement('div');
     grid.className = 'grid-container';

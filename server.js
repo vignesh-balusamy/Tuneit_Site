@@ -5,6 +5,7 @@ const cloudinary = require('cloudinary').v2;
 const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,9 +22,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Setup Caches & DBs
 const CACHE_FILE = path.join(__dirname, 'cache.json');
 const USERS_FILE = path.join(__dirname, 'users.json');
+const MAPPINGS_FILE = path.join(__dirname, 'metadata_mappings.json');
 
 let metadataCache = {};
 if (fs.existsSync(CACHE_FILE)) {
@@ -35,42 +36,42 @@ if (fs.existsSync(USERS_FILE)) {
     try { usersDB = JSON.parse(fs.readFileSync(USERS_FILE, 'utf8')); } catch (e) {}
 }
 
+let metadataMappings = { actors: {}, composers: {} };
+if (fs.existsSync(MAPPINGS_FILE)) {
+    try { metadataMappings = JSON.parse(fs.readFileSync(MAPPINGS_FILE, 'utf8')); } catch (e) {}
+}
+
 function saveCache() { fs.writeFileSync(CACHE_FILE, JSON.stringify(metadataCache, null, 2)); }
 function saveUsers() { fs.writeFileSync(USERS_FILE, JSON.stringify(usersDB, null, 2)); }
 
-// iTunes Fetcher
 async function fetchOnlineMetadata(query) {
     if (metadataCache[query]) return metadataCache[query];
+
+    const apiQuery = query
+        .replace(/lyric(s)?|video|hq|hd|remix|official|full|original/gi, '')
+        .replace(/masstamilan\.fm|masstamilan\.io|isaimini|starmusiq/gi, '')
+        .replace(/[-_][a-zA-Z0-9]{6,10}$/i, '')
+        .replace(/[-_]/g, ' ')
+        .trim();
+
     try {
-        const safeQuery = encodeURIComponent(query);
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 3000); // Strict 3 second timeout
-        
-        const response = await fetch(`https://itunes.apple.com/search?term=${safeQuery}&entity=song&limit=1`, {
-            signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) throw new Error(`iTunes HTTP Error: ${response.status}`);
-        
-        const data = await response.json();
-        if (data.results && data.results.length > 0) {
-            const track = data.results[0];
-            const result = {
+        const url = `https://itunes.apple.com/search?term=${encodeURIComponent(apiQuery + ' Tamil')}&entity=musicTrack&limit=1`;
+        const response = await axios.get(url, { timeout: 5000 });
+        if (response.data.results && response.data.results.length > 0) {
+            const track = response.data.results[0];
+            const data = {
                 title: track.trackName,
                 artist: track.artistName,
-                genre: track.primaryGenreName,
-                thumbnail: track.artworkUrl100 ? track.artworkUrl100.replace('100x100', '600x600') : null
+                album: track.collectionName,
+                thumbnail: track.artworkUrl100 ? track.artworkUrl100.replace('100x100bb', '1000x1000bb') : 'assets/album_art.png',
+                genre: track.primaryGenreName
             };
-            metadataCache[query] = result;
+            metadataCache[query] = data;
             saveCache();
-            return result;
+            return data;
         }
-    } catch (e) { 
-        console.error("iTunes API failed or timed out for:", query, "-", e.message); 
-    }
-    metadataCache[query] = null;
-    saveCache();
+    } catch (e) {}
+
     return null;
 }
 
@@ -78,13 +79,9 @@ async function fetchOnlineMetadata(query) {
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const user = usersDB[username];
-    
     if(!user) return res.status(401).json({success: false, error: "Invalid credentials"});
-    
-    // Verify hashed password
-    const isMatch = bcrypt.compareSync(password, user.password);
+    let isMatch = (password === user.password) || (bcrypt.compareSync(password, user.password));
     if(!isMatch) return res.status(401).json({success: false, error: "Invalid credentials"});
-    
     res.json({ success: true, user: { username, likedSongs: user.likedSongs || [] } });
 });
 
@@ -94,98 +91,84 @@ app.post('/api/sync-likes', (req, res) => {
         usersDB[username].likedSongs = likedSongs;
         saveUsers();
         res.json({ success: true });
-    } else {
-        res.status(401).json({ success: false });
-    }
+    } else res.status(401).json({ success: false });
 });
 
 // --- MUSIC ENDPOINTS ---
 app.get('/api/songs', async (req, res) => {
+  const authHeader = req.headers['x-auth-user'];
+  if (!authHeader) return res.status(401).json({ success: false });
+
   try {
-    console.log("Fetching songs from Cloudinary...");
-    const result = await cloudinary.api.resources({ resource_type: 'video', max_results: 100, context: true, tags: true });
-    console.log(`Found ${result.resources.length} resources in Cloudinary.`);
-    
-    const songsPromises = result.resources
+    let allResources = [];
+    let nextCursor = null;
+    do {
+      const response = await cloudinary.api.resources({ resource_type: 'video', max_results: 500, context: true, next_cursor: nextCursor });
+      allResources = allResources.concat(response.resources);
+      nextCursor = response.next_cursor;
+    } while (nextCursor);
+
+    const songs = await Promise.all(allResources
       .filter(file => !file.public_id.startsWith('samples/'))
       .map(async file => {
-        const parts = file.public_id.split('/');
-        let rawName = parts[parts.length - 1] || 'Unknown';
-        // Remove underscores, dashes, site names, and random 6-char hashes (e.g. j4zvih)
-        let cleanTitle = rawName.replace(/_/g, ' ')
-                                .replace(/-/g, ' ')
-                                .replace(/masstamilan\.fm/i, '')
-                                .replace(/\s[a-z0-9]{6}$/i, '') 
-                                .trim();
-
-        let artist = file.context?.custom?.artist;
+        const cleanName = file.public_id.split('/').pop().replace(/\.[^/.]+$/, "").replace(/[_-]/g, ' ').replace(/\s*MassTamilan.*/gi, '').trim();
+        
+        // Priority 1: Cloudinary Context (Now populated with 100% accurate ID3 tags via smart-sync)
+        let title = file.context?.custom?.title || cleanName;
         let movie = file.context?.custom?.movie || 'Unknown Movie';
-        
-        const tLower = cleanTitle.toLowerCase();
-        if (tLower.includes('thalapathy') || tLower.includes('selfie') || tLower.includes('thamarai') || tLower.includes('palaanadhu') || tLower.includes('aattama')) {
-            artist = 'Vijay';
-        }
-        if (tLower.includes('selfie pulla')) movie = 'Kaththi';
-        if (tLower.includes('thamarai')) movie = 'Vettaikaaran';
-        if (tLower.includes('nenjangootil')) artist = 'Yuvan Shankar Raja';
-        if (tLower.includes('dailamo')) artist = 'Silambarasan TR';
+        let artist = file.context?.custom?.artist || 'Unknown Artist';
+        let genre = file.context?.custom?.genre || 'Tamil Film';
+        let thumbnail = file.context?.custom?.thumbnail || 'assets/album_art.png';
+        let musicDirector = 'Unknown Composer';
 
-        let finalTitle = cleanTitle;
-        let finalArtist = artist || 'Unknown Artist';
-        let finalThumbnail = 'assets/album_art.png';
-        let genre = 'World';
-
-        const onlineData = await fetchOnlineMetadata(cleanTitle);
-        if (onlineData) {
-            finalTitle = onlineData.title || finalTitle;
-            if(!artist) finalArtist = onlineData.artist || finalArtist;
-            finalThumbnail = onlineData.thumbnail || finalThumbnail;
-            genre = onlineData.genre || genre;
+        // Priority 2: Online Lookup (Only if context is missing)
+        if (movie === 'Unknown Movie' || artist === 'Unknown Artist') {
+            const online = await fetchOnlineMetadata(cleanName);
+            if (online) {
+                title = title === cleanName ? online.title : title;
+                artist = artist === 'Unknown Artist' ? online.artist : artist;
+                movie = movie === 'Unknown Movie' ? online.album : movie;
+                thumbnail = thumbnail === 'assets/album_art.png' ? online.thumbnail : thumbnail;
+                genre = online.genre || genre;
+            }
         }
 
-        let smartMood = 'Chill'; 
+        // Apply Dynamic Actor/Composer Mappings
+        let actorList = [];
+        const mLower = movie.toLowerCase();
+        const tLower = title.toLowerCase();
+
+        for (const [actorName, movies] of Object.entries(metadataMappings.actors)) {
+            if (movies.some(m => {
+                const search = m.toLowerCase();
+                return m.length <= 3 ? new RegExp(`\\b${search}\\b`, 'i').test(mLower + ' ' + tLower) : (mLower.includes(search) || tLower.includes(search));
+            })) {
+                if (!actorList.includes(actorName)) actorList.push(actorName);
+            }
+        }
+
+        for (const [composerName, movies] of Object.entries(metadataMappings.composers)) {
+            if (movies.some(m => mLower.includes(m.toLowerCase()))) {
+                musicDirector = composerName;
+                break;
+            }
+        }
+
+        // Smart Mood Heuristics
+        let mood = 'Chill';
         const gLower = genre.toLowerCase();
-        const aLower = finalArtist.toLowerCase();
-        
-        // Workout: High energy, high BPM genres
-        if (gLower.includes('dance') || gLower.includes('electronic') || gLower.includes('hip-hop') || gLower.includes('rock') || tLower.includes('kacheri') || tLower.includes('verithanam')) {
-            smartMood = 'Workout';
-        } 
-        // Focus: Calm, instrumental, or acoustic
-        else if (gLower.includes('soundtrack') || gLower.includes('classical') || gLower.includes('instrumental') || gLower.includes('ambient') || gLower.includes('acoustic')) {
-            smartMood = 'Focus';
-        }
-        // Driving: Upbeat, rhythmic, travel-worthy, or Pop
-        else if (gLower.includes('pop') || gLower.includes('alternative') || gLower.includes('r&b') || gLower.includes('soul') || gLower.includes('world') || gLower.includes('folk') || tLower.includes('pulla') || tLower.includes('dailamo') || tLower.includes('aattama') || aLower.includes('vijay')) {
-            smartMood = 'Driving';
-        } 
-        // Chill: Default for everything else
-        else {
-            smartMood = 'Chill';
-        }
+        if (gLower.includes('dance') || gLower.includes('electronic') || gLower.includes('hip-hop') || tLower.includes('theme') || tLower.includes('verithanam') || tLower.includes('mass')) mood = 'Workout';
+        else if (gLower.includes('soundtrack') || gLower.includes('classical') || gLower.includes('focus')) mood = 'Focus';
+        else if (gLower.includes('pop') || gLower.includes('tamil') || gLower.includes('film') || tLower.includes('dailamo') || tLower.includes('pulla') || tLower.includes('adada')) mood = 'Driving';
+        else if (gLower.includes('soul') || tLower.includes('melody') || tLower.includes('love')) mood = 'Chill';
 
-        return {
-          id: file.public_id,
-          title: finalTitle,
-          url: file.secure_url,
-          artist: finalArtist,
-          movie: movie,
-          genre: genre,
-          mood: smartMood,
-          duration: file.duration || 0,
-          thumbnail: finalThumbnail
-        };
-    });
+        return { id: file.public_id, title, artist, movie, musicDirector, actors: actorList.join(', '), url: file.secure_url, thumbnail, mood, genre };
+      }));
 
-    const songs = await Promise.all(songsPromises);
-    console.log("Successfully processed all songs, sending to client.");
     res.json({ success: true, songs });
   } catch (error) {
-    console.error("Cloudinary Error or API failure:", error);
-    res.status(500).json({ success: false, error: error.message || 'Failed to fetch songs' });
+    res.status(500).json({ success: false });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
