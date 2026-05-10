@@ -59,6 +59,23 @@ const btnRepeat = document.getElementById('btn-repeat');
 const btnLike = document.getElementById('btn-like');
 const btnMute = document.getElementById('btn-mute');
 
+// Full Player Mobile DOM
+const fullPlayerOverlay = document.getElementById('full-player');
+const fpCloseBtn = document.getElementById('fp-close');
+const fpArt = document.getElementById('fp-art');
+const fpTitle = document.getElementById('fp-title');
+const fpArtist = document.getElementById('fp-artist');
+const fpPlayPauseBtn = document.getElementById('fp-play-pause');
+const fpPrevBtn = document.getElementById('fp-prev');
+const fpNextBtn = document.getElementById('fp-next');
+const fpShuffleBtn = document.getElementById('fp-shuffle');
+const fpRepeatBtn = document.getElementById('fp-repeat');
+const fpProgressFill = document.getElementById('fp-progress-fill');
+const fpCurrentTimeEl = document.getElementById('fp-current-time');
+const fpTotalTimeEl = document.getElementById('fp-total-time');
+
+const nowPlayingContainer = document.querySelector('.now-playing');
+
 // State Variables
 let isPlaying = false;
 let allSongs = [];
@@ -632,6 +649,27 @@ function toggleQueue() {
 btnQueueToggle.addEventListener('click', toggleQueue);
 btnCloseQueue.addEventListener('click', toggleQueue);
 
+function openFullPlayer() {
+    if (window.innerWidth > 1024) return;
+    fullPlayerOverlay.style.display = 'flex';
+    setTimeout(() => fullPlayerOverlay.classList.add('open'), 10);
+}
+
+function closeFullPlayer() {
+    fullPlayerOverlay.classList.remove('open');
+    setTimeout(() => fullPlayerOverlay.style.display = 'none', 400);
+}
+
+nowPlayingContainer.addEventListener('click', () => {
+    if (window.innerWidth <= 1024) openFullPlayer();
+});
+fpCloseBtn.addEventListener('click', closeFullPlayer);
+fpPlayPauseBtn.addEventListener('click', togglePlayPause);
+fpPrevBtn.addEventListener('click', playPrev);
+fpNextBtn.addEventListener('click', playNext);
+fpShuffleBtn.addEventListener('click', () => { isShuffle = !isShuffle; updateControlStyles(); savePlaybackState(); });
+fpRepeatBtn.addEventListener('click', () => { repeatMode = (repeatMode + 1) % 3; updateControlStyles(); savePlaybackState(); });
+
 function renderQueueView() {
     queueList.innerHTML = '';
     if(currentPlaylist.length === 0 || currentIndex === -1) {
@@ -686,6 +724,11 @@ function playSong(songId) {
     bottomTitle.textContent = song.title;
     bottomArtist.textContent = song.artist;
     bottomAlbumArt.src = song.thumbnail;
+    
+    // Sync Full Player
+    fpTitle.textContent = song.title;
+    fpArtist.textContent = song.artist;
+    fpArt.src = song.thumbnail;
     
     updateLikeIcon();
     reRenderCurrentView();

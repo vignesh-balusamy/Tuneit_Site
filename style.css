@@ -821,17 +821,18 @@ button { background: none; border: none; color: inherit; cursor: pointer; }
     transform: translateY(-2px);
 }
 
-/* --- Spotify-Style Mobile Overhaul --- */
-@media (max-width: 1024px) {
+/* --- Universal Responsiveness (Mobile & Tablet) --- */
+@media (max-width: 1280px) {
     body { 
-        overflow: hidden;
-        height: 100vh;
-        background: #000; /* True black for Spotify feel */
+        overflow: hidden !important;
+        height: 100dvh !important;
+        background: #000;
+        position: fixed;
     }
     
     .app-container {
         flex-direction: column;
-        height: 100vh;
+        height: 100dvh;
         border: none;
         background: transparent;
     }
@@ -859,8 +860,9 @@ button { background: none; border: none; color: inherit; cursor: pointer; }
     }
 
     .main-content {
-        height: calc(100vh - 150px);
-        background: linear-gradient(180deg, #121212 0%, #000 100%);
+        height: calc(100dvh - 150px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .top-bar { 
@@ -872,8 +874,15 @@ button { background: none; border: none; color: inherit; cursor: pointer; }
     .content-scroll { padding: 12px; }
     
     .grid-container {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 16px;
+    }
+
+    @media (max-width: 600px) {
+        .grid-container {
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
     }
 
     .music-card {
@@ -931,21 +940,25 @@ button { background: none; border: none; color: inherit; cursor: pointer; }
     }
 
     .control-buttons {
-        gap: 0;
+        gap: 8px;
     }
     
-    .control-btn#btn-prev, .control-btn#btn-next, .control-btn#btn-shuffle, .control-btn#btn-repeat {
-        display: none; /* Only play/pause on mini player */
+    /* Re-enable skip buttons but keep them compact */
+    .control-btn#btn-prev, .control-btn#btn-next {
+        display: flex !important;
+    }
+    .control-btn#btn-shuffle, .control-btn#btn-repeat {
+        display: none; 
     }
 
     .play-pause-btn {
-        width: 32px;
-        height: 32px;
-        background: transparent;
-        color: #fff !important;
+        width: 40px;
+        height: 40px;
+        background: #fff;
+        color: #000 !important;
     }
     
-    .play-pause-btn i { width: 28px; height: 28px; }
+    .play-pause-btn i { width: 24px; height: 24px; }
 
     .progress-container {
         position: absolute;
@@ -976,3 +989,67 @@ button { background: none; border: none; color: inherit; cursor: pointer; }
         font-weight: 600;
     }
 }
+
+/* --- Full Screen Player Overlay --- */
+.full-player-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #121212;
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    padding: 40px 24px;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform: translateY(100%);
+}
+
+.full-player-overlay.open {
+    display: flex;
+    transform: translateY(0);
+}
+
+.full-player-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.full-player-art {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    margin-bottom: 40px;
+    object-fit: cover;
+}
+
+.full-player-info {
+    margin-bottom: 40px;
+}
+
+.full-player-title { font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+.full-player-artist { font-size: 18px; color: #b3b3b3; }
+
+.full-player-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.full-player-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fp-btn { color: #fff; background: none; border: none; font-size: 24px; }
+.fp-play-btn { width: 72px; height: 72px; background: #fff; color: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+.fp-play-btn i { width: 32px; height: 32px; }
+
+.fp-progress-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; position: relative; }
+.fp-progress-fill { height: 100%; background: #fff; border-radius: 2px; width: 0%; }
+.fp-time-info { display: flex; justify-content: space-between; font-size: 12px; color: #b3b3b3; margin-top: 8px; }

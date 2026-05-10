@@ -79,6 +79,13 @@
                     <a href="#" class="nav-item-sub" id="nav-driving">Driving</a>
                 </div>
             </div>
+            
+            <!-- Legal Safety Footer -->
+            <div class="sidebar-footer" style="padding: 16px; font-size: 10px; color: var(--text-muted); border-top: 1px solid var(--glass-border); margin-top: auto;">
+                <p>© 2026 Tune4me</p>
+                <p>Private Instance • Personal Use Only</p>
+                <p style="margin-top: 4px;">Metadata via iTunes API</p>
+            </div>
         </aside>
 
         <!-- Main Content -->
@@ -203,6 +210,36 @@
             <span>Logout</span>
         </a>
     </nav>
+
+    <!-- Full Screen Player Overlay (Mobile) -->
+    <div class="full-player-overlay" id="full-player">
+        <div class="full-player-header">
+            <button class="fp-btn" id="fp-close"><i data-lucide="chevron-down"></i></button>
+            <div style="font-weight: 600; font-size: 14px;">Now Playing</div>
+            <button class="fp-btn"><i data-lucide="more-horizontal"></i></button>
+        </div>
+        <img src="assets/album_art.png" class="full-player-art" id="fp-art">
+        <div class="full-player-info">
+            <div class="full-player-title" id="fp-title">Song Title</div>
+            <div class="full-player-artist" id="fp-artist">Artist Name</div>
+        </div>
+        <div class="full-player-controls">
+            <div class="fp-progress-container">
+                <div class="fp-progress-fill" id="fp-progress-fill"></div>
+            </div>
+            <div class="fp-time-info">
+                <span id="fp-current-time">0:00</span>
+                <span id="fp-total-time">0:00</span>
+            </div>
+            <div class="full-player-buttons">
+                <button class="fp-btn" id="fp-shuffle"><i data-lucide="shuffle"></i></button>
+                <button class="fp-btn" id="fp-prev"><i data-lucide="skip-back"></i></button>
+                <button class="fp-play-btn" id="fp-play-pause"><i data-lucide="play"></i></button>
+                <button class="fp-btn" id="fp-next"><i data-lucide="skip-forward"></i></button>
+                <button class="fp-btn" id="fp-repeat"><i data-lucide="repeat"></i></button>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
