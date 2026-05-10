@@ -1,6 +1,6 @@
 {
-  "appId": "com.vignesh.tuneit",
-  "appName": "Tuneit",
+  "appId": "com.vignesh.tune4me",
+  "appName": "Tune4me",
   "webDir": "dist",
   "server": {
     "url": "https://tuneit-music.onrender.com",

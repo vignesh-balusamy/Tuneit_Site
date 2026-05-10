@@ -446,6 +446,37 @@ button { background: none; border: none; color: inherit; cursor: pointer; }
     text-overflow: ellipsis;
 }
 
+.card-artist-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.8));
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    pointer-events: none;
+}
+
+.card-duration-tag {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: white;
+    pointer-events: none;
+}
+
 /* Queue Panel */
 .queue-panel {
     width: 300px;
@@ -784,116 +815,157 @@ button { background: none; border: none; color: inherit; cursor: pointer; }
     transform: translateY(-2px);
 }
 
-/* --- Mobile Overhaul --- */
+/* --- Spotify-Style Mobile Overhaul --- */
 @media (max-width: 1024px) {
     body { 
-        overflow: hidden; /* Prevent double scroll */
+        overflow: hidden;
         height: 100vh;
+        background: #000; /* True black for Spotify feel */
     }
     
     .app-container {
         flex-direction: column;
         height: 100vh;
         border: none;
+        background: transparent;
     }
 
     .sidebar { display: none !important; }
     
     .mobile-bottom-nav { 
         display: flex !important; 
-        padding-bottom: env(safe-area-inset-bottom); 
+        background: rgba(18, 18, 18, 0.98);
+        height: 70px;
+        padding-bottom: env(safe-area-inset-bottom);
+        border-top: none;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+    }
+
+    .mobile-nav-item {
+        color: #b3b3b3;
+        font-size: 11px;
+    }
+
+    .mobile-nav-item i { width: 24px; height: 24px; margin-bottom: 2px; }
+
+    .mobile-nav-item.active {
+        color: #fff;
     }
 
     .main-content {
-        height: calc(100vh - 145px); /* Adjusted for player + nav */
-        overflow-y: auto;
+        height: calc(100vh - 150px);
+        background: linear-gradient(180deg, #121212 0%, #000 100%);
     }
 
     .top-bar { 
-        padding: 12px 16px;
-        background: rgba(7, 14, 28, 0.9);
+        padding: 16px;
+        background: transparent;
+        justify-content: flex-end;
     }
     
-    .content-scroll { padding: 16px; }
+    .content-scroll { padding: 12px; }
     
     .grid-container {
-        grid-template-columns: 1fr 1fr; /* Fixed 2 columns for cleaner look */
+        grid-template-columns: 1fr 1fr;
         gap: 12px;
     }
 
     .music-card {
-        padding: 10px;
+        background: #181818;
+        padding: 12px;
+        border: none;
     }
 
-    .card-title { font-size: 14px; }
-    .card-subtitle { font-size: 11px; }
+    .card-title { font-size: 14px; font-weight: 700; color: #fff; }
+    .card-subtitle { font-size: 12px; color: #b3b3b3; }
 
-    .section-title { font-size: 18px; margin-bottom: 16px; }
+    .section-title { font-size: 22px; font-weight: 800; margin-bottom: 20px; }
 
-    /* Compact Mobile Player Bar */
+    /* Spotify Floating Mini Player */
     .player-bar {
         position: fixed;
-        bottom: 65px;
-        left: 0;
-        right: 0;
-        height: 80px;
-        border-top: 1px solid var(--glass-border);
-        background: rgba(10, 15, 28, 0.95);
-        display: flex;
-        align-items: center;
+        bottom: 80px; /* Above mobile nav */
+        left: 8px;
+        right: 8px;
+        height: 56px;
+        border-radius: 8px;
+        background: #282828 !important;
+        border: none;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+        z-index: 99;
+        overflow: hidden;
     }
 
     .player-content-wrapper {
-        flex-direction: row; /* Keep it horizontal but compact */
         height: 100%;
         padding: 0 12px;
+        display: flex;
+        align-items: center;
         justify-content: space-between;
     }
 
     .now-playing {
-        width: 60%;
+        width: 70%;
         min-width: 0;
-        gap: 10px;
+        gap: 12px;
     }
 
     .now-playing-img {
-        width: 44px;
-        height: 44px;
+        width: 40px;
+        height: 40px;
+        border-radius: 4px;
     }
 
-    .now-playing-info .title { font-size: 13px; }
-    .now-playing-info .artist { font-size: 11px; }
+    .now-playing-info .title { font-size: 13px; font-weight: 600; white-space: nowrap; }
+    .now-playing-info .artist { font-size: 11px; color: #b3b3b3; }
 
     .player-controls {
-        width: 40%;
-        gap: 0;
-        padding: 0;
+        width: auto;
     }
 
     .control-buttons {
-        gap: 15px;
+        gap: 0;
+    }
+    
+    .control-btn#btn-prev, .control-btn#btn-next, .control-btn#btn-shuffle, .control-btn#btn-repeat {
+        display: none; /* Only play/pause on mini player */
     }
 
     .play-pause-btn {
-        width: 36px;
-        height: 36px;
+        width: 32px;
+        height: 32px;
+        background: transparent;
+        color: #fff !important;
     }
+    
+    .play-pause-btn i { width: 28px; height: 28px; }
 
     .progress-container {
         position: absolute;
-        top: -3px;
-        left: 0;
-        right: 0;
+        bottom: 0;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        height: 2px;
         padding: 0;
     }
 
-    .progress-bar-bg { height: 3px; border-radius: 0; }
-    .time { display: none; } /* Hide time strings on mobile to save space */
+    .progress-bar-bg { height: 2px; background: rgba(255,255,255,0.1); }
+    .progress-bar-fill { background: #fff; }
 
-    .visualizer-wrapper, .volume-controls, .nav-arrows, .search-container { display: none; }
+    .visualizer-wrapper, .volume-controls, .nav-arrows, .search-container, .time { display: none; }
     
     #search-container-mobile {
         display: flex !important;
-        margin-bottom: 16px;
+        background: #282828;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+    }
+    
+    #search-input-mobile {
+        background: transparent;
+        border: none;
+        font-weight: 600;
     }
 }

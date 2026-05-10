@@ -111,7 +111,12 @@ app.get('/api/songs', async (req, res) => {
       .map(async file => {
         const parts = file.public_id.split('/');
         let rawName = parts[parts.length - 1] || 'Unknown';
-        let cleanTitle = rawName.replace(/_/g, ' ').replace(/-/g, ' ').replace(/masstamilan\.fm/i, '').trim();
+        // Remove underscores, dashes, site names, and random 6-char hashes (e.g. j4zvih)
+        let cleanTitle = rawName.replace(/_/g, ' ')
+                                .replace(/-/g, ' ')
+                                .replace(/masstamilan\.fm/i, '')
+                                .replace(/\s[a-z0-9]{6}$/i, '') 
+                                .trim();
 
         let artist = file.context?.custom?.artist;
         let movie = file.context?.custom?.movie || 'Unknown Movie';

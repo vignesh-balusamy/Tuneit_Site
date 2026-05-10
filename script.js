@@ -421,6 +421,16 @@ function renderHomeView() {
 function renderLibraryView() {
     dynamicContent.innerHTML = '';
     if(allSongs.length === 0) return;
+
+    // On mobile, show Favorites at the top of Library
+    if (window.innerWidth <= 1024) {
+        const likes = getLikedSongs();
+        const favSongs = allSongs.filter(s => likes.includes(s.id));
+        if(favSongs.length > 0) {
+            dynamicContent.appendChild(createSection('Your Favorites', favSongs, favSongs));
+        }
+    }
+
     const byArtist = {};
     allSongs.forEach(song => {
         if(!byArtist[song.artist]) byArtist[song.artist] = [];
@@ -497,10 +507,14 @@ function createSection(title, songsToRender, contextPlaylist) {
         const isDownloaded = downloadedSongIds.includes(song.id);
         const dlClass = isDownloaded ? 'downloaded' : '';
         const dlIcon = isDownloaded ? 'check-circle' : 'download';
+        
+        const durationFormatted = song.duration ? formatTime(song.duration) : '';
 
         card.innerHTML = `
             <div class="card-img-wrapper">
-                <img src="${song.thumbnail}" alt="Album Art" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/26/26437.png';">
+                <img src="${song.thumbnail}" alt="Album Art" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/26/26437.png'; this.nextElementSibling.style.display='flex';">
+                <div class="card-artist-overlay" style="display:none;">${song.artist}</div>
+                <div class="card-duration-tag">${durationFormatted}</div>
                 <button class="card-download-btn ${dlClass}" data-id="${song.id}">
                     <i data-lucide="${dlIcon}" style="width: 16px; height: 16px;"></i>
                 </button>
