@@ -145,10 +145,24 @@ app.get('/api/songs', async (req, res) => {
 
         let smartMood = 'Chill'; 
         const gLower = genre.toLowerCase();
+        const aLower = finalArtist.toLowerCase();
         
-        if (gLower.includes('dance') || gLower.includes('electronic') || gLower.includes('hip-hop') || gLower.includes('rock') || tLower.includes('kacheri')) smartMood = 'Workout';
-        else if (gLower.includes('soundtrack') || gLower.includes('classical') || gLower.includes('instrumental')) smartMood = 'Focus';
-        else if (gLower.includes('pop') || gLower.includes('alternative') || gLower.includes('r&b') || gLower.includes('soul')) smartMood = 'Driving';
+        // Workout: High energy, high BPM genres
+        if (gLower.includes('dance') || gLower.includes('electronic') || gLower.includes('hip-hop') || gLower.includes('rock') || tLower.includes('kacheri') || tLower.includes('verithanam')) {
+            smartMood = 'Workout';
+        } 
+        // Focus: Calm, instrumental, or acoustic
+        else if (gLower.includes('soundtrack') || gLower.includes('classical') || gLower.includes('instrumental') || gLower.includes('ambient') || gLower.includes('acoustic')) {
+            smartMood = 'Focus';
+        }
+        // Driving: Upbeat, rhythmic, travel-worthy, or Pop
+        else if (gLower.includes('pop') || gLower.includes('alternative') || gLower.includes('r&b') || gLower.includes('soul') || gLower.includes('world') || gLower.includes('folk') || tLower.includes('pulla') || tLower.includes('dailamo') || tLower.includes('aattama') || aLower.includes('vijay')) {
+            smartMood = 'Driving';
+        } 
+        // Chill: Default for everything else
+        else {
+            smartMood = 'Chill';
+        }
 
         return {
           id: file.public_id,

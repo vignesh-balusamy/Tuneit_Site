@@ -317,22 +317,28 @@ button { background: none; border: none; color: inherit; cursor: pointer; }
 
 /* Premium Music Card */
 .music-card {
-    background: var(--bg-card);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
-    padding: 16px;
     border-radius: 12px;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    padding: 16px;
     cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     overflow: hidden;
 }
 
 .music-card:hover {
-    background: var(--bg-card-hover);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.4);
-    border-color: rgba(255,255,255,0.15);
+    transform: translateY(-8px) scale(1.02);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    border-color: var(--accent);
+}
+
+.music-card.active-card {
+    border-color: var(--accent);
+    background: rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
 .card-img-wrapper {
@@ -885,13 +891,14 @@ button { background: none; border: none; color: inherit; cursor: pointer; }
     .player-bar {
         position: fixed;
         bottom: 80px; /* Above mobile nav */
-        left: 8px;
-        right: 8px;
-        height: 56px;
-        border-radius: 8px;
-        background: #282828 !important;
-        border: none;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+        left: 10px;
+        right: 10px;
+        height: 64px;
+        border-radius: 12px;
+        background: rgba(40, 40, 40, 0.95) !important;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.8);
         z-index: 99;
         overflow: hidden;
     }
