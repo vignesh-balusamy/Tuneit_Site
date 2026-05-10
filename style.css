@@ -785,7 +785,7 @@ button { background: none; border: none; color: inherit; cursor: pointer; }
 }
 
 /* --- Mobile Overhaul --- */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     body { 
         overflow: hidden; /* Prevent double scroll */
         height: 100vh;
@@ -797,11 +797,11 @@ button { background: none; border: none; color: inherit; cursor: pointer; }
         border: none;
     }
 
-    .sidebar { display: none; }
+    .sidebar { display: none !important; }
     
     .mobile-bottom-nav { 
-        display: flex; 
-        padding-bottom: env(safe-area-inset-bottom); /* Support for iPhone notch area */
+        display: flex !important; 
+        padding-bottom: env(safe-area-inset-bottom); 
     }
 
     .main-content {
