@@ -147,5 +147,82 @@
     "genre": "Telugu",
     "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/a0/ce/7a/a0ce7a95-e7e2-9479-3713-9699d95dff4f/cover.jpg/600x600bb.jpg"
   },
-  "Palaanadhu Palaanadhu MassTamilan": null
+  "Palaanadhu Palaanadhu MassTamilan": null,
+  "Allegra Allegra": {
+    "title": "Aaluma Doluma",
+    "artist": "Anirudh Ravichander & Badshah",
+    "album": "Vedalam (Original Motion Picture Soundtrack) - EP",
+    "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music6/v4/10/39/c0/1039c02d-58c7-2e54-1c55-070e88694a30/886445559323.jpg/1000x1000bb.jpg",
+    "genre": "Tamil"
+  },
+  "Valayapatti": {
+    "title": "Valayapatti Thavile",
+    "artist": "A.R. Rahman, Na.Muthukumar, Naresh Iyer, Ujjayinee Roy, Srimathumitha & Darshana KT",
+    "album": "Azhagiya Tamil Magan (Original Motion Picture Soundtrack) - EP",
+    "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/d1/4d/87/d14d87fb-cb04-7178-5755-e2e53d126fce/5034644196183.jpg/1000x1000bb.jpg",
+    "genre": "Soundtrack"
+  },
+  "Thendralai Kandu": {
+    "title": "Thendralai Kandu",
+    "artist": "Ilaiyaraaja, Vaasan & Hariharan",
+    "album": "Nilave Mugam Kaattu (Original Motion Picture Soundtrack)",
+    "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/3d/c0/88/3dc0884a-4e9c-fc5f-78e0-5a20e6be7806/197338555767.jpg/1000x1000bb.jpg",
+    "genre": "Soundtrack"
+  },
+  "Aval Varuvala": {
+    "title": "Aval Varuvala (From \"Naerukku Naer\")",
+    "artist": "Hariharan & Shahul Hameed",
+    "album": "Surya and Dhanush Hits",
+    "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music/v4/bb/0a/6e/bb0a6e08-1a06-b70b-a420-410da2a06acb/dj.zhcnmaxl.jpg/1000x1000bb.jpg",
+    "genre": "Tamil"
+  },
+  "Thottu Thottu": {
+    "title": "Thottu Thottu (From \"Kaadhal\")",
+    "artist": "Haricharan & Harini Sudakaran",
+    "album": "Na. Muthu Kumar Special",
+    "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music5/v4/5c/6f/d6/5c6fd684-4f5f-da45-43f4-2467f342ea60/840896103641.jpg/1000x1000bb.jpg",
+    "genre": "Tamil"
+  },
+  "Kadhalukku Kankal Illai": {
+    "title": "Kadhalukku Kankal Illai",
+    "artist": "Devi Sri Prasad & Kavivarman",
+    "album": "Santhosh Subramaniyam (Original Motion Picture Soundtrack)",
+    "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/ba/92/0e/ba920e14-4f66-3cdc-721f-13d2934ab5e2/193483825953.jpg/1000x1000bb.jpg",
+    "genre": "Tamil"
+  },
+  "Yethi Yethi": {
+    "title": "Yethi Yethi",
+    "artist": "Benny Dayal, Harris Jayaraj, Naresh Iyer & Solar Sai",
+    "album": "Vaaranam Aayiram (Original Motion Picture Soundtrack)",
+    "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/0e/1b/c1/0e1bc194-973e-9e04-c8d9-b12cfbc71289/888880794635.jpg/1000x1000bb.jpg",
+    "genre": "Tamil"
+  },
+  "Hasili Fisiliye": {
+    "title": "Hasili Fisiliye",
+    "artist": "Karthik, Harini, Dr.Burn & Maya",
+    "album": "Aadhavan (Original Motion Picture Soundtrack)",
+    "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/09/3b/66/093b6615-7ccb-a206-6e37-2cb4d2f1f2e7/886443215467.jpg/1000x1000bb.jpg",
+    "genre": "Tamil"
+  },
+  "Anbe En Anbe": {
+    "title": "Anbe En Anbe",
+    "artist": "Harris Jayaraj & Harish Raghavendra",
+    "album": "Dhaam Dhoom (Original Motion Picture Soundtrack) - EP",
+    "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/1f/d5/d0/1fd5d075-d99f-17d5-35f5-1e0f971dfc42/8904337239152.jpg/1000x1000bb.jpg",
+    "genre": "Soundtrack"
+  },
+  "En Peru Meenakumari": {
+    "title": "En Peru Meenakumari",
+    "artist": "Devi Sri Prasad, Viveka & Malathy Lakshman",
+    "album": "Evergreen Folk",
+    "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/4d/6b/d2/4d6bd24a-77b2-9362-1d70-0b24a242003f/5034644610153.jpg/1000x1000bb.jpg",
+    "genre": "Soundtrack"
+  },
+  "Onnavitta Yaarum Yenakilla": {
+    "title": "Onnavitta Yaarum Yenakilla (Version 1)",
+    "artist": "D. Imman, Sean Roldan & Shreya Ghoshal",
+    "album": "Seemaraja (Original Motion Picture Soundtrack)",
+    "thumbnail": "https://is1-ssl.mzstatic.com/image/thumb/Music128/v4/18/5a/18/185a1836-b841-4306-a10d-0b4adc4d8866/cover.jpg/1000x1000bb.jpg",
+    "genre": "Tamil"
+  }
 }
