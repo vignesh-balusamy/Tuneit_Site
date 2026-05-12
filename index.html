@@ -92,13 +92,20 @@
         <main class="main-content">
             <header class="top-bar glass-panel-header">
                 <div class="nav-arrows">
-                    <button class="icon-btn"><i data-lucide="chevron-left"></i></button>
-                    <button class="icon-btn"><i data-lucide="chevron-right"></i></button>
+                    <button class="icon-btn" id="mobile-menu-btn" title="Menu"><i data-lucide="menu"></i></button>
+                    <button class="icon-btn desktop-only"><i data-lucide="chevron-right"></i></button>
                 </div>
                 
-                <div class="search-container" id="search-container" style="display: none;">
+                <!-- Desktop search -->
+                <div class="search-container desktop-only" id="search-container" style="display: none;">
                     <i data-lucide="search" class="search-icon-input"></i>
                     <input type="text" id="search-input" placeholder="Search by title, artist, or genre...">
+                </div>
+
+                <!-- Mobile inline search -->
+                <div class="search-container mobile-search-inline" id="mobile-search-inline" style="display:none;">
+                    <i data-lucide="search" class="search-icon-input"></i>
+                    <input type="text" id="search-input-inline" placeholder="Search songs, movies, artists...">
                 </div>
 
                 <div class="user-profile" id="user-profile-btn" title="Login / Profile">
@@ -205,11 +212,77 @@
             <i data-lucide="library"></i>
             <span>Library</span>
         </a>
+        <a href="#" class="mobile-nav-item" id="m-nav-playlists">
+            <i data-lucide="list-music"></i>
+            <span>Playlists</span>
+        </a>
         <a href="#" class="mobile-nav-item" id="m-btn-logout" style="color: #ef4444;">
             <i data-lucide="log-out"></i>
             <span>Logout</span>
         </a>
     </nav>
+
+    <!-- Mobile Playlists Drawer -->
+    <div class="mobile-drawer-overlay" id="mobile-drawer-overlay"></div>
+    <div class="mobile-drawer" id="mobile-playlists-drawer">
+        <div class="mobile-drawer-handle"></div>
+        <div class="mobile-drawer-header">
+            <span>Your Playlists</span>
+            <button class="icon-btn" id="mobile-drawer-close"><i data-lucide="x"></i></button>
+        </div>
+        <div class="mobile-drawer-content">
+            <a href="#" class="mobile-drawer-item" id="md-nav-favorites">
+                <div class="mobile-drawer-item-icon" style="background: linear-gradient(135deg, #e11d48, #9f1239);">
+                    <i data-lucide="heart"></i>
+                </div>
+                <div class="mobile-drawer-item-info">
+                    <span class="mobile-drawer-item-title">Favorites</span>
+                    <span class="mobile-drawer-item-sub">Your liked songs</span>
+                </div>
+                <i data-lucide="chevron-right" class="mobile-drawer-arrow"></i>
+            </a>
+            <a href="#" class="mobile-drawer-item" id="md-nav-chill">
+                <div class="mobile-drawer-item-icon" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">
+                    <i data-lucide="cloud"></i>
+                </div>
+                <div class="mobile-drawer-item-info">
+                    <span class="mobile-drawer-item-title">Chill Vibes</span>
+                    <span class="mobile-drawer-item-sub">Relax &amp; unwind</span>
+                </div>
+                <i data-lucide="chevron-right" class="mobile-drawer-arrow"></i>
+            </a>
+            <a href="#" class="mobile-drawer-item" id="md-nav-workout">
+                <div class="mobile-drawer-item-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">
+                    <i data-lucide="zap"></i>
+                </div>
+                <div class="mobile-drawer-item-info">
+                    <span class="mobile-drawer-item-title">Workout Mix</span>
+                    <span class="mobile-drawer-item-sub">High energy beats</span>
+                </div>
+                <i data-lucide="chevron-right" class="mobile-drawer-arrow"></i>
+            </a>
+            <a href="#" class="mobile-drawer-item" id="md-nav-focus">
+                <div class="mobile-drawer-item-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">
+                    <i data-lucide="brain"></i>
+                </div>
+                <div class="mobile-drawer-item-info">
+                    <span class="mobile-drawer-item-title">Focus</span>
+                    <span class="mobile-drawer-item-sub">Stay in the zone</span>
+                </div>
+                <i data-lucide="chevron-right" class="mobile-drawer-arrow"></i>
+            </a>
+            <a href="#" class="mobile-drawer-item" id="md-nav-driving">
+                <div class="mobile-drawer-item-icon" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <i data-lucide="car"></i>
+                </div>
+                <div class="mobile-drawer-item-info">
+                    <span class="mobile-drawer-item-title">Driving</span>
+                    <span class="mobile-drawer-item-sub">Road trip vibes</span>
+                </div>
+                <i data-lucide="chevron-right" class="mobile-drawer-arrow"></i>
+            </a>
+        </div>
+    </div>
 
     <!-- Full Screen Player Overlay (Mobile) -->
     <div class="full-player-overlay" id="full-player">

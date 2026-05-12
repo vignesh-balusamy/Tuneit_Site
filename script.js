@@ -49,7 +49,19 @@ const btnLogout = document.getElementById('btn-logout');
 const mNavHome = document.getElementById('m-nav-home');
 const mNavSearch = document.getElementById('m-nav-search');
 const mNavLibrary = document.getElementById('m-nav-library');
+const mNavPlaylists = document.getElementById('m-nav-playlists');
 const mBtnLogout = document.getElementById('m-btn-logout');
+
+// Mobile Drawer DOM
+const mobileDrawerOverlay = document.getElementById('mobile-drawer-overlay');
+const mobilePlaylistsDrawer = document.getElementById('mobile-playlists-drawer');
+const mobileDrawerClose = document.getElementById('mobile-drawer-close');
+const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+
+// Mobile Inline Search
+const mobileSearchInline = document.getElementById('mobile-search-inline');
+const searchInputInline = document.getElementById('search-input-inline');
+
 
 // Controls
 const btnShuffle = document.getElementById('btn-shuffle');
@@ -1084,5 +1096,120 @@ function updateVolumeUI() {
     }
     lucide.createIcons();
 }
+
+// ============================================
+// MOBILE NAV & DRAWER HANDLERS
+// ============================================
+
+function openMobileDrawer() {
+    mobileDrawerOverlay.style.display = 'block';
+    mobilePlaylistsDrawer.style.display = 'block';
+    requestAnimationFrame(() => {
+        mobileDrawerOverlay.classList.add('open');
+        mobilePlaylistsDrawer.classList.add('open');
+    });
+    lucide.createIcons({ root: mobilePlaylistsDrawer });
+}
+
+function closeMobileDrawer() {
+    mobileDrawerOverlay.classList.remove('open');
+    mobilePlaylistsDrawer.classList.remove('open');
+    setTimeout(() => {
+        mobileDrawerOverlay.style.display = 'none';
+        mobilePlaylistsDrawer.style.display = 'none';
+    }, 400);
+}
+
+function setMobileNavActive(el) {
+    document.querySelectorAll('.mobile-nav-item').forEach(i => i.classList.remove('active'));
+    if (el) el.classList.add('active');
+}
+
+// Mobile Bottom Nav
+if (mNavHome) mNavHome.addEventListener('click', (e) => {
+    e.preventDefault();
+    setMobileNavActive(mNavHome);
+    updateNavUI('nav-home');
+    renderHomeView();
+    // Hide inline search
+    if (mobileSearchInline) mobileSearchInline.style.display = 'none';
+});
+
+if (mNavSearch) mNavSearch.addEventListener('click', (e) => {
+    e.preventDefault();
+    setMobileNavActive(mNavSearch);
+    updateNavUI('nav-search');
+    renderSearchView('');
+    // Show inline search and focus
+    if (mobileSearchInline) {
+        mobileSearchInline.style.display = 'flex';
+        setTimeout(() => searchInputInline && searchInputInline.focus(), 100);
+    }
+});
+
+if (mNavLibrary) mNavLibrary.addEventListener('click', (e) => {
+    e.preventDefault();
+    setMobileNavActive(mNavLibrary);
+    updateNavUI('nav-library');
+    renderLibraryView();
+    if (mobileSearchInline) mobileSearchInline.style.display = 'none';
+});
+
+if (mNavPlaylists) mNavPlaylists.addEventListener('click', (e) => {
+    e.preventDefault();
+    setMobileNavActive(mNavPlaylists);
+    openMobileDrawer();
+});
+
+if (mBtnLogout) mBtnLogout.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (confirm('Log out of Tune4me?')) {
+        localStorage.removeItem(STORAGE_USER);
+        currentUser = null;
+        updateAvatar();
+        appContainer.style.display = 'none';
+        authModal.style.display = 'flex';
+    }
+});
+
+// Drawer close
+if (mobileDrawerClose) mobileDrawerClose.addEventListener('click', closeMobileDrawer);
+if (mobileDrawerOverlay) mobileDrawerOverlay.addEventListener('click', closeMobileDrawer);
+
+// Drawer playlist items
+function drawerNavigate(renderFn, activeNavId) {
+    closeMobileDrawer();
+    clearActiveNav();
+    if (activeNavId) {
+        const el = document.getElementById(activeNavId);
+        if (el) el.classList.add('active');
+    }
+    setMobileNavActive(null); // clear mobile highlight
+    setTimeout(renderFn, 350); // wait for drawer close animation
+}
+
+const mdFavorites = document.getElementById('md-nav-favorites');
+const mdChill = document.getElementById('md-nav-chill');
+const mdWorkout = document.getElementById('md-nav-workout');
+const mdFocus = document.getElementById('md-nav-focus');
+const mdDriving = document.getElementById('md-nav-driving');
+
+if (mdFavorites) mdFavorites.addEventListener('click', (e) => { e.preventDefault(); drawerNavigate(renderFavoritesView, 'nav-favorites'); });
+if (mdChill)     mdChill.addEventListener('click',     (e) => { e.preventDefault(); drawerNavigate(() => renderSmartMoodView('Chill'), 'nav-chill'); });
+if (mdWorkout)   mdWorkout.addEventListener('click',   (e) => { e.preventDefault(); drawerNavigate(() => renderSmartMoodView('Workout'), 'nav-workout'); });
+if (mdFocus)     mdFocus.addEventListener('click',     (e) => { e.preventDefault(); drawerNavigate(() => renderSmartMoodView('Focus'), 'nav-focus'); });
+if (mdDriving)   mdDriving.addEventListener('click',   (e) => { e.preventDefault(); drawerNavigate(() => renderSmartMoodView('Driving'), 'nav-driving'); });
+
+// Mobile inline search
+if (searchInputInline) {
+    searchInputInline.addEventListener('input', (e) => {
+        renderSearchView(e.target.value);
+    });
+}
+
+// Mobile menu button (hamburger) — shows playlists drawer
+if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', () => {
+    openMobileDrawer();
+});
 
 init();

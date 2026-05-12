@@ -10,16 +10,27 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+// Sanitize a Cloudinary public_id to a clean, human-readable name
+function cleanPublicId(rawId) {
+    // Get just the base filename (strip folder prefix)
+    const base = rawId.split('/').pop();
+    // Remove trailing random hash added by Cloudinary (e.g. "_abc123xyz")
+    // Pattern: underscore followed by 8-20 alphanumeric chars at end
+    return base.replace(/_[a-z0-9]{8,20}$/i, '');
+}
+
 // Upload a raw image buffer to Cloudinary and return its URL
 async function uploadEmbeddedArt(pictureData, publicId) {
+    const artId = `thumbnails/${cleanPublicId(publicId)}`;
     return new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
-            { public_id: `thumbnails/${publicId}`, overwrite: true, resource_type: 'image' },
+            { public_id: artId, overwrite: true, resource_type: 'image' },
             (err, result) => err ? reject(err) : resolve(result.secure_url)
         );
         Readable.from(Buffer.from(pictureData)).pipe(stream);
     });
 }
+
 
 async function syncMetadata() {
     console.log("Starting Smart Metadata Sync (Extracting Embedded ID3 Art)...\n");
