@@ -85,6 +85,23 @@ const fpRepeatBtn = document.getElementById('fp-repeat');
 const fpProgressFill = document.getElementById('fp-progress-fill');
 const fpCurrentTimeEl = document.getElementById('fp-current-time');
 const fpTotalTimeEl = document.getElementById('fp-total-time');
+const fpCarModeBtn = document.getElementById('fp-car-mode-btn');
+
+// Car Mode DOM
+const carModeOverlay = document.getElementById('car-mode-overlay');
+const carModeExitBtn = document.getElementById('car-mode-exit');
+const carArt = document.getElementById('car-art');
+const carTitle = document.getElementById('car-title');
+const carArtist = document.getElementById('car-artist');
+const carPlayBtn = document.getElementById('car-play');
+const carPrevBtn = document.getElementById('car-prev');
+const carNextBtn = document.getElementById('car-next');
+const carShuffleBtn = document.getElementById('car-shuffle');
+const carRepeatBtn = document.getElementById('car-repeat');
+const carProgressFill = document.getElementById('car-progress-fill');
+const carProgressBg = document.getElementById('car-progress-bg');
+const carCurrentEl = document.getElementById('car-current');
+const carTotalEl = document.getElementById('car-total');
 
 const nowPlayingContainer = document.querySelector('.now-playing');
 
@@ -876,6 +893,7 @@ function playSong(songId) {
     fpArt.src = song.thumbnail;
     
     updateLikeIcon();
+    updateCarModeUI();
     reRenderCurrentView();
     setupMediaSession(song);
     savePlaybackState();
@@ -1009,13 +1027,30 @@ function updateControlStyles() {
 }
 
 function updatePlayIcons(state) {
-    if (state === 'play') {
-        bottomPlayBtn.innerHTML = '<i data-lucide="play" id="play-icon-bottom" style="margin-left: 2px;"></i>';
-        if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
-    } else {
-        bottomPlayBtn.innerHTML = '<i data-lucide="pause" id="play-icon-bottom"></i>';
-        if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
+    const isPlay = state === 'play';
+
+    // Mini player (bottom bar)
+    bottomPlayBtn.innerHTML = isPlay
+        ? '<i data-lucide="play" id="play-icon-bottom" style="margin-left: 2px;"></i>'
+        : '<i data-lucide="pause" id="play-icon-bottom"></i>';
+
+    // Full-screen player overlay (mobile)
+    if (fpPlayPauseBtn) {
+        fpPlayPauseBtn.innerHTML = isPlay
+            ? '<i data-lucide="play" style="margin-left:2px;"></i>'
+            : '<i data-lucide="pause"></i>';
     }
+
+    // Car Mode player
+    if (carPlayBtn) {
+        carPlayBtn.innerHTML = isPlay
+            ? '<i data-lucide="play" style="margin-left:4px;"></i>'
+            : '<i data-lucide="pause"></i>';
+    }
+
+    if ('mediaSession' in navigator)
+        navigator.mediaSession.playbackState = isPlay ? 'paused' : 'playing';
+
     lucide.createIcons();
     reRenderCurrentView();
 }
@@ -1032,15 +1067,33 @@ audio.addEventListener('pause', () => {
 });
 
 audio.addEventListener('loadedmetadata', () => {
-    totalTimeEl.textContent = formatTime(audio.duration);
+    const dur = formatTime(audio.duration);
+    totalTimeEl.textContent = dur;
+    // Sync full-screen player total time
+    if (fpTotalTimeEl) fpTotalTimeEl.textContent = dur;
+    // Sync Car Mode total time
+    if (carTotalEl) carTotalEl.textContent = dur;
 });
 
 audio.addEventListener('timeupdate', () => {
     if(audio.duration) {
         const progressPercent = (audio.currentTime / audio.duration) * 100;
+        const currentFormatted = formatTime(audio.currentTime);
+
+        // Mini player progress
         progressBarFill.style.width = `${progressPercent}%`;
-        currentTimeEl.textContent = formatTime(audio.currentTime);
-        
+        currentTimeEl.textContent = currentFormatted;
+
+        // Full-screen player progress
+        if (fpProgressFill) fpProgressFill.style.width = `${progressPercent}%`;
+        if (fpCurrentTimeEl) fpCurrentTimeEl.textContent = currentFormatted;
+        if (fpTotalTimeEl)   fpTotalTimeEl.textContent = formatTime(audio.duration);
+
+        // Car Mode progress
+        if (carProgressFill) carProgressFill.style.width = `${progressPercent}%`;
+        if (carCurrentEl)    carCurrentEl.textContent = currentFormatted;
+        if (carTotalEl)      carTotalEl.textContent = formatTime(audio.duration);
+
         if(Math.floor(audio.currentTime) % 3 === 0) {
             savePlaybackState();
         }
@@ -1072,6 +1125,18 @@ progressBarBg.addEventListener('click', (e) => {
         savePlaybackState();
     }
 });
+
+// Full-screen player progress bar — tap to seek
+const fpProgressContainer = document.querySelector('.fp-progress-container');
+if (fpProgressContainer) {
+    fpProgressContainer.addEventListener('click', (e) => {
+        if(!currentSongId || !audio.duration) return;
+        const rect = fpProgressContainer.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        audio.currentTime = (clickX / rect.width) * audio.duration;
+        savePlaybackState();
+    });
+}
 
 volumeBarBg.addEventListener('click', (e) => {
     const width = volumeBarBg.clientWidth;
@@ -1211,5 +1276,76 @@ if (searchInputInline) {
 if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', () => {
     openMobileDrawer();
 });
+
+// ============================================
+// CAR MODE HANDLERS
+// ============================================
+
+function openCarMode() {
+    if (carModeOverlay) {
+        carModeOverlay.classList.add('active');
+        fullPlayerOverlay.classList.remove('open'); // Hide full player when car mode starts
+        updateCarModeUI();
+        lucide.createIcons({ root: carModeOverlay });
+    }
+}
+
+function closeCarMode() {
+    if (carModeOverlay) {
+        carModeOverlay.classList.remove('active');
+    }
+}
+
+function updateCarModeUI() {
+    if (!currentSongId || !carModeOverlay.classList.contains('active')) return;
+    
+    const song = allSongs.find(s => s.id === currentSongId);
+    if (!song) return;
+
+    if (carTitle) carTitle.textContent = song.title;
+    if (carArtist) carArtist.textContent = song.artist || 'Unknown Artist';
+    if (carArt) carArt.src = song.thumbnail || 'assets/album_art.png';
+
+    // Update Shuffle/Repeat buttons in Car Mode
+    if (carShuffleBtn) {
+        carShuffleBtn.classList.toggle('active', isShuffle);
+    }
+    if (carRepeatBtn) {
+        carRepeatBtn.classList.toggle('active', repeatMode > 0);
+        const icon = carRepeatBtn.querySelector('i');
+        if (icon) {
+            icon.setAttribute('data-lucide', repeatMode === 2 ? 'repeat-1' : 'repeat');
+            lucide.createIcons({ root: carRepeatBtn });
+        }
+    }
+}
+
+if (fpCarModeBtn) fpCarModeBtn.addEventListener('click', openCarMode);
+if (carModeExitBtn) carModeExitBtn.addEventListener('click', closeCarMode);
+
+// Car Mode Controls
+if (carPlayBtn) carPlayBtn.addEventListener('click', togglePlayPause);
+if (carPrevBtn) carPrevBtn.addEventListener('click', playPrev);
+if (carNextBtn) carNextBtn.addEventListener('click', playNext);
+if (carShuffleBtn) carShuffleBtn.addEventListener('click', () => {
+    toggleShuffle();
+    updateCarModeUI();
+});
+if (carRepeatBtn) carRepeatBtn.addEventListener('click', () => {
+    toggleRepeat();
+    updateCarModeUI();
+});
+
+
+// Car Mode Progress Bar — tap to seek
+if (carProgressBg) {
+    carProgressBg.addEventListener('click', (e) => {
+        if(!currentSongId || !audio.duration) return;
+        const rect = carProgressBg.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        audio.currentTime = (clickX / rect.width) * audio.duration;
+        savePlaybackState();
+    });
+}
 
 init();

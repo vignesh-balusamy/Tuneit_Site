@@ -289,7 +289,9 @@
         <div class="full-player-header">
             <button class="fp-btn" id="fp-close"><i data-lucide="chevron-down"></i></button>
             <div style="font-weight: 600; font-size: 14px;">Now Playing</div>
-            <button class="fp-btn"><i data-lucide="more-horizontal"></i></button>
+            <button class="fp-btn" id="fp-car-mode-btn" title="Car Mode">
+                <i data-lucide="car"></i>
+            </button>
         </div>
         <img src="assets/album_art.png" class="full-player-art" id="fp-art">
         <div class="full-player-info">
@@ -311,6 +313,63 @@
                 <button class="fp-btn" id="fp-next"><i data-lucide="skip-forward"></i></button>
                 <button class="fp-btn" id="fp-repeat"><i data-lucide="repeat"></i></button>
             </div>
+        </div>
+    </div>
+
+    <!-- Car Mode Overlay -->
+    <div class="car-mode-overlay" id="car-mode-overlay">
+        <div class="car-mode-header">
+            <button class="car-mode-exit" id="car-mode-exit">
+                <i data-lucide="x"></i>
+                <span>Exit Car Mode</span>
+            </button>
+            <div class="car-mode-badge">
+                <i data-lucide="car"></i>
+                <span>Car Mode</span>
+            </div>
+        </div>
+
+        <div class="car-mode-art-wrap">
+            <img id="car-art" src="assets/album_art.png" class="car-mode-art"
+                 onerror="this.src='https://cdn-icons-png.flaticon.com/512/26/26437.png'">
+        </div>
+
+        <div class="car-mode-info">
+            <div class="car-mode-title" id="car-title">Select a song</div>
+            <div class="car-mode-artist" id="car-artist">—</div>
+        </div>
+
+        <div class="car-mode-progress-wrap">
+            <div class="car-mode-progress-bg" id="car-progress-bg">
+                <div class="car-mode-progress-fill" id="car-progress-fill"></div>
+            </div>
+            <div class="car-mode-times">
+                <span id="car-current">0:00</span>
+                <span id="car-total">0:00</span>
+            </div>
+        </div>
+
+        <div class="car-mode-controls">
+            <button class="car-ctrl-btn" id="car-prev">
+                <i data-lucide="skip-back"></i>
+            </button>
+            <button class="car-play-btn" id="car-play">
+                <i data-lucide="play"></i>
+            </button>
+            <button class="car-ctrl-btn" id="car-next">
+                <i data-lucide="skip-forward"></i>
+            </button>
+        </div>
+
+        <div class="car-mode-secondary">
+            <button class="car-sec-btn" id="car-shuffle">
+                <i data-lucide="shuffle"></i>
+                <span>Shuffle</span>
+            </button>
+            <button class="car-sec-btn" id="car-repeat">
+                <i data-lucide="repeat"></i>
+                <span>Repeat</span>
+            </button>
         </div>
     </div>
 
